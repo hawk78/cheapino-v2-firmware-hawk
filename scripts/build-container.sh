@@ -24,10 +24,17 @@ mkdir -p "$ROOT/.cache" "$ROOT/build"
     -v "$ROOT:/workspace" \
     -w /workspace \
     "$IMAGE" \
-    -lc '
+    -c '
 set -euo pipefail
 mkdir -p "$HOME"
 git config --global --add safe.directory "*"
+
+command -v qmk >/dev/null || {
+    echo "qmk CLI missing from container PATH: $PATH" >&2
+    exit 4
+}
+echo "qmk=$(command -v qmk)"
+qmk --version
 
 VIAL_PIN="$(tr -d "[:space:]" < VIAL_QMK_COMMIT)"
 CHEAPINO_PIN="$(tr -d "[:space:]" < UPSTREAM_CHEAPINO_COMMIT)"
