@@ -17,29 +17,49 @@ Pinned Vial-QMK base:
 - `vial-kb/vial-qmk`
 - revision: `dd43959ae5c08d8a28d38a1acf7b04e86b14a344`
 
-The Vial-QMK tree is not vendored. `make bootstrap` clones the pinned revision into `.cache/`; our Cheapino source is then overlaid from `keyboard/cheapino/`.
+The Vial-QMK tree is not vendored. Our Cheapino-specific source lives in `keyboard/cheapino/` and is overlaid onto the pinned Vial-QMK checkout for each clean build.
 
 ## Local build only
 
 No GitHub Actions workflow is provided. CI must not be introduced or run without explicit approval.
 
+The default build uses a pinned QMK CLI container and prefers Podman, falling back to Docker:
+
 ```sh
-make bootstrap
 make build
 ```
 
-The resulting UF2 and build metadata are copied to `build/`.
+This produces:
 
-At this stage the build intentionally does not change key behavior, tapping policy, Vial settings, or the layout stored in EEPROM.
+```text
+build/cheapino_vial.uf2
+build/build.log
+build/build-manifest.txt
+```
+
+A native toolchain path is also kept for development:
+
+```sh
+make build-native
+```
+
+The container image, Vial-QMK revision and Cheapino source provenance are all pinned in versioned files.
+
+## Current state
+
+The pinned source pair has already been shown to compile successfully. The first reconstructed UF2 is not byte-for-byte identical to the encoder-enabled reference binary published by `bleys43`; this difference is tracked rather than hidden. See `docs/BASELINE.md`.
+
+At this stage we intentionally do not change key behavior, tapping policy, Vial settings, or the user's dynamic layout stored in EEPROM.
 
 ## Roadmap
 
-1. reproduce the current firmware locally;
-2. record the exact build/toolchain requirements;
-3. compare the baseline with current Vial/QMK and current Cheapino upstream work;
-4. migrate while preserving behavior;
-5. add custom debugging or tap/hold behavior only if still useful after the migration.
+1. reproduce the baseline locally with `make build`;
+2. explain or classify the binary delta against the published reference;
+3. validate the reproduced firmware on the real keyboard;
+4. compare the baseline with current Vial/QMK and current Cheapino upstream work;
+5. migrate while preserving behavior and rollback;
+6. add custom debugging or tap/hold behavior only if still useful after the migration.
 
 ## Licensing and provenance
 
-The Cheapino/QMK-derived firmware is GPL-2.0-or-later. Original copyright and SPDX notices are retained in imported source files. See `PROVENANCE.md` and `LICENSE`.
+The Cheapino/QMK-derived firmware is GPL-2.0-or-later/GPL-2.0 as applicable to the upstream files. Original copyright and SPDX notices are retained where present. See `PROVENANCE.md` and `LICENSE`.
