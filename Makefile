@@ -1,9 +1,12 @@
-.PHONY: bootstrap build clean distclean status
+.PHONY: build build-native bootstrap clean distclean status
+
+build:
+	./scripts/build-container.sh
 
 bootstrap:
 	./scripts/bootstrap-vial-qmk.sh
 
-build: bootstrap
+build-native: bootstrap
 	./scripts/build-firmware.sh
 
 status:
