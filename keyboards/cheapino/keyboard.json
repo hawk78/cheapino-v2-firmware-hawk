@@ -1,19 +1,52 @@
 {
     "manufacturer": "Thomas Haukland",
-    "keyboard_name": "Cheapino2",
+    "keyboard_name": "cheapino",
     "maintainer": "tompi",
     "bootloader": "rp2040",
     "diode_direction": "ROW2COL",
+    "ws2812": {
+        "driver": "vendor",
+        "pin": "GP16"
+    },
     "features": {
         "bootmagic": true,
+        "caps_word": true,
         "command": false,
         "console": false,
+        "deferred_exec": true,
+        "encoder": true,
         "extrakey": true,
         "mousekey": true,
-        "nkro": true
+        "nkro": false,
+        "rgblight": true
     },
-    "community_layouts": ["split_3x5_3"],
+    "tapping": {
+        "term": 230
+    },
+    "caps_word": {
+        "both_shifts_turns_on": true
+    },
+    "encoder": {
+        "_comment0": "These are unused but have to be defined. The encoder is",
+        "_comment1": "actually handled by matrix intersections; see encoder.c",
+        "rotary": [
+            {
+                "pin_a": "GP9",
+                "pin_b": "GP10"
+            }
+        ]
+    },
+    "rgblight": {
+        "led_count": 1,
+        "default": {
+            "hue": 128,
+            "sat": 128,
+            "val": 64
+        }
+    },
     "matrix_pins": {
+        "custom": true,
+        "custom_lite": true,
         "cols": [
             "GP6",
             "GP6",
@@ -29,15 +62,23 @@
             "GP26",
             "GP26"
         ],
-        "rows": ["GP3", "GP1", "GP2", "GP0",    "GP27", "GP28", "GP29", "GP8"]
+        "rows": [
+            "GP3",
+            "GP1",
+            "GP2",
+            "GP0",
+            "GP27",
+            "GP28",
+            "GP29",
+            "GP8"
+        ]
     },
     "processor": "RP2040",
     "url": "",
     "usb": {
-        "device_version": "2.0.1",
-        "pid": "0xAFB7",
-        "vid": "0xFEF3",
-        "force_nkro": false
+        "device_version": "1.0.0",
+        "pid": "0x0000",
+        "vid": "0xFEE3"
     },
     "layouts": {
         "LAYOUT_split_3x5_3": {
@@ -47,6 +88,8 @@
                 { "matrix": [4, 8], "x": 2, "y": 0 },
                 { "matrix": [4, 7], "x": 3, "y": 0.125 },
                 { "matrix": [4, 6], "x": 4, "y": 0.25 },
+
+                { "matrix": [3, 0], "x": 6, "y": 0.25 },
 
                 { "matrix": [0, 0], "x": 7, "y": 0.25 },
                 { "matrix": [0, 1], "x": 8, "y": 0.125 },
@@ -87,9 +130,7 @@
 
                 { "matrix": [0, 5], "x": 6.5, "y": 3.75 },
                 { "matrix": [1, 5], "x": 7.5, "y": 3.5 },
-                { "matrix": [2, 5], "x": 8.5, "y": 3.25 },
-
-                { "matrix": [3, 0], "x": 8.5, "y": 3.25 }
+                { "matrix": [2, 5], "x": 8.5, "y": 3.25 }
             ]
         }
     }

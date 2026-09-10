@@ -25,11 +25,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "config.h"
 #include "quantum.h"
 #include "debounce.h"
-#include "encoder.h"
-#include "ghosting.h"
 #include "print.h"
 
-#define MATRIX_IO_DELAY 30
+// How long the scanning code waits for changed io to settle.
+// Adjust from default 30 to weigh up for increased time spent ghost-hunting.
+// (the rp2040 does not seem to have any problems with this value...)
+#define MATRIX_IO_DELAY 25
 
 #define COL_SHIFTER ((uint16_t)1)
 
@@ -117,19 +118,17 @@ void matrix_init_custom(void) {
 }
 
 void store_old_matrix(matrix_row_t current_matrix[]) {
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        previous_matrix[i] = current_matrix[i];
-    }
+    memcpy(previous_matrix, current_matrix, MATRIX_ROWS * sizeof(matrix_row_t));
 }
 
 bool has_matrix_changed(matrix_row_t current_matrix[]) {
-    for (uint8_t i = 0; i < MATRIX_ROWS; i++) {
-        if (previous_matrix[i] != current_matrix[i]) return true;
-    }
-    return false;
+    return memcmp(previous_matrix, current_matrix, MATRIX_ROWS * sizeof(matrix_row_t)) != 0;
 }
 
 bool matrix_scan_custom(matrix_row_t current_matrix[]) {
+    extern void fix_encoder_action(matrix_row_t current_matrix[]);
+    extern void fix_ghosting(matrix_row_t matrix[]);
+
     store_old_matrix(current_matrix);
     // Set row, read cols
     for (uint8_t current_row = 0; current_row < MATRIX_ROWS; current_row++) {
