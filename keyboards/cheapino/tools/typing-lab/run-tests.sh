@@ -20,8 +20,18 @@ cc -std=c11 -Wall -Wextra -Werror -pedantic \
   -o "$build/test_telemetry"
 "$build/test_telemetry"
 
+cc -std=c11 -Wall -Wextra -Werror -pedantic \
+  -DCHEAPINO_TELEMETRY_RING_CAPACITY=16 \
+  -I"$here/tests/firmware-stubs" -I"$firmware" \
+  "$here/tests/firmware_bridge.c" "$firmware/telemetry.c" "$firmware/ring.c" \
+  -o "$build/firmware_bridge"
+
+CHEAPINO_TELEMETRY_FIRMWARE_BRIDGE="$build/firmware_bridge" \
 PYTHONPATH="$here/src${PYTHONPATH:+:$PYTHONPATH}" \
   python3 -m unittest discover -s "$here/tests" -p 'test_*.py' -v
 
 PYTHONPATH="$here/src${PYTHONPATH:+:$PYTHONPATH}" \
   python3 -m compileall -q "$here/src"
+
+PYTHONPATH="$here/src${PYTHONPATH:+:$PYTHONPATH}" \
+  python3 -m cheapino_typing_lab --help >/dev/null

@@ -34,6 +34,8 @@ From this directory:
 ./run-tests.sh
 ```
 
-That command compiles and executes both the ring buffer and the firmware command/hook layer against a small native QMK stub with strict warnings, runs protocol/client integration tests against a fake HID transport, and compile-checks all Python modules. It requires no keyboard and no ARM toolchain.
+That command compiles and executes the ring buffer and firmware command/hook layer against a small native QMK stub with strict warnings. It also builds a native firmware bridge that runs the real `telemetry.c`/`ring.c` implementation behind a 32-byte stdin/stdout transport; the Python `TelemetryClient` is exercised against that process, so C/Python wire-format drift is caught without a keyboard. The remaining protocol, HID-discovery and client tests run against focused fakes, all Python modules are compile-checked, and the CLI entry point gets a smoke test.
 
-The dedicated GitHub Actions workflow runs the same native tests and then builds `cheapino:vial` with telemetry enabled inside the pinned QMK toolchain container. That full firmware build is the integration gate for real QMK hook signatures and RP2040/ChibiOS compilation.
+The dedicated GitHub Actions workflow runs those native tests and then builds `cheapino:vial` with telemetry enabled inside the pinned QMK toolchain container. That full firmware build is the integration gate for real QMK hook signatures and RP2040/ChibiOS compilation.
+
+An RP2040 emulator is intentionally not part of the default gate: at this stage it would mostly re-run code already covered by the native bridge while still not reproducing the physical matrix or USB timing of a real Cheapino. Hardware-in-the-loop Raw HID testing remains the only useful next layer for device-specific behavior.
