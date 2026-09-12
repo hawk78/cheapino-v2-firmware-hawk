@@ -2,17 +2,7 @@ name: Cheapino typing lab
 
 on:
   push:
-    paths:
-      - 'keyboards/cheapino/features/telemetry/**'
-      - 'keyboards/cheapino/tools/typing-lab/**'
-      - 'keyboards/cheapino/rules.mk'
-      - '.github/workflows/cheapino-typing-lab.yml'
   pull_request:
-    paths:
-      - 'keyboards/cheapino/features/telemetry/**'
-      - 'keyboards/cheapino/tools/typing-lab/**'
-      - 'keyboards/cheapino/rules.mk'
-      - '.github/workflows/cheapino-typing-lab.yml'
   workflow_dispatch:
 
 permissions: {}
