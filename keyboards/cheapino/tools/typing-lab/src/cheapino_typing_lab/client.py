@@ -8,6 +8,7 @@ from .protocol import (
     Info,
     ReadResponse,
     Status,
+    StatusFlags,
     decode_info,
     decode_read,
     decode_status,
@@ -69,8 +70,10 @@ class TelemetryClient:
                 f"expected {self._expected_read_sequence}"
             )
         self._expected_read_sequence = (response.sequence + 1) & 0xFFFF
-        if reject_drops and response.dropped_low16:
-            raise DroppedEventsError(f"firmware reports at least {response.dropped_low16} dropped event(s)")
+        if reject_drops and (response.flags & StatusFlags.DROPPED):
+            raise DroppedEventsError(
+                f"firmware reports dropped events (low16 counter={response.dropped_low16})"
+            )
         return response
 
     def drain(self, *, reject_drops: bool = True, max_reads: int = 65536):

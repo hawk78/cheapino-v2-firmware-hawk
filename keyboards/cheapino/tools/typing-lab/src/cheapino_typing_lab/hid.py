@@ -28,16 +28,24 @@ class HidTransport:
     def open(cls, *, vid: int | None = None, pid: int | None = None) -> "HidTransport":
         hid = _load_hid()
         candidates = []
-        for entry in hid.enumerate(vid or 0, pid or 0):
-            if entry.get("usage_page") == RAW_HID_USAGE_PAGE and entry.get("usage") == RAW_HID_USAGE:
-                candidates.append(entry)
+        # HIDAPI treats zero VID/PID arguments as wildcards. Cheapino's PID is
+        # actually 0x0000, so enforce VID/PID equality ourselves after enumeration.
+        for entry in hid.enumerate(vid or 0, 0):
+            if vid is not None and entry.get("vendor_id") != vid:
+                continue
+            if pid is not None and entry.get("product_id") != pid:
+                continue
+            if entry.get("usage_page") != RAW_HID_USAGE_PAGE or entry.get("usage") != RAW_HID_USAGE:
+                continue
+            candidates.append(entry)
+
         if not candidates:
             raise HidTransportError("Cheapino/VIA Raw HID interface not found")
-        if len(candidates) > 1 and (vid is None or pid is None):
+        if len(candidates) != 1:
             rendered = ", ".join(
                 f"{item.get('vendor_id', 0):04x}:{item.get('product_id', 0):04x}" for item in candidates
             )
-            raise HidTransportError(f"multiple VIA Raw HID interfaces found ({rendered}); specify --vid and --pid")
+            raise HidTransportError(f"multiple matching VIA Raw HID interfaces found ({rendered})")
 
         dev = hid.device()
         dev.open_path(candidates[0]["path"])
@@ -55,11 +63,11 @@ class HidTransport:
     def exchange(self, report: bytes) -> bytes:
         if len(report) != 32:
             raise ValueError("Raw HID payload must be exactly 32 bytes")
-        # hidapi's write() includes the report-id byte even for unnumbered reports.
+        # HIDAPI requires an explicit zero report-id byte for unnumbered reports.
         written = self.device.write(b"\x00" + report)
-        if written not in (32, 33):
+        if written != 33:
             raise HidTransportError(f"short Raw HID write: {written}")
-        response = bytes(self.device.read(32, timeout_ms=1000))
+        response = bytes(self.device.read(32, 1000))
         if len(response) != 32:
             raise HidTransportError(f"short Raw HID read: {len(response)}")
         return response

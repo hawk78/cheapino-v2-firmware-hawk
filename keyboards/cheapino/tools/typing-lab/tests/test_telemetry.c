@@ -46,6 +46,7 @@ void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
 static void command(uint8_t report[CHEAPINO_TELEMETRY_REPORT_SIZE], uint8_t id) {
     memset(report, 0, CHEAPINO_TELEMETRY_REPORT_SIZE);
     report[0] = id;
+    report[1] = CHEAPINO_TELEMETRY_PROTOCOL_VERSION;
     raw_hid_receive_kb(report, CHEAPINO_TELEMETRY_REPORT_SIZE);
 }
 
@@ -65,6 +66,12 @@ int main(void) {
             assert((packed & 0x0F) == col);
         }
     }
+
+    memset(report, 0, sizeof(report));
+    report[0] = CHEAPINO_TELEMETRY_GET_INFO;
+    report[1] = CHEAPINO_TELEMETRY_PROTOCOL_VERSION + 1u;
+    raw_hid_receive_kb(report, sizeof(report));
+    assert(report[0] == id_unhandled);
 
     command(report, CHEAPINO_TELEMETRY_GET_INFO);
     assert(report[0] == CHEAPINO_TELEMETRY_GET_INFO);
@@ -130,8 +137,9 @@ int main(void) {
     matrix_scan_kb();
     memset(report, 0, sizeof(report));
     report[0] = CHEAPINO_TELEMETRY_MARK;
-    report[1] = 7;
-    cheapino_telemetry_write_u16_le(&report[2], 0x4567);
+    report[1] = CHEAPINO_TELEMETRY_PROTOCOL_VERSION;
+    report[2] = 7;
+    cheapino_telemetry_write_u16_le(&report[3], 0x4567);
     raw_hid_receive_kb(report, sizeof(report));
     assert(report[0] == CHEAPINO_TELEMETRY_MARK);
     command(report, CHEAPINO_TELEMETRY_READ);

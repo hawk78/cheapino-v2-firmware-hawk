@@ -137,7 +137,7 @@ void cheapino_telemetry_scan_matrix(void) {
         const matrix_row_t now     = matrix_get_row(row);
         matrix_row_t       changed = now ^ previous_matrix[row];
         while (changed != 0) {
-            const uint8_t col = (uint8_t)__builtin_ctz((unsigned int)changed);
+            const uint8_t      col = (uint8_t)__builtin_ctz((unsigned int)changed);
             const matrix_row_t bit = ((matrix_row_t)1u << col);
             const cheapino_telemetry_event_v1_t event = {
                 .timestamp_ms = timer_read32(),
@@ -233,6 +233,13 @@ bool cheapino_telemetry_raw_hid_receive(uint8_t *data, uint8_t length) {
     }
 
     const uint8_t command = data[0];
+    if (command < CHEAPINO_TELEMETRY_GET_INFO || command > CHEAPINO_TELEMETRY_PING) {
+        return false;
+    }
+    if (data[1] != CHEAPINO_TELEMETRY_PROTOCOL_VERSION) {
+        return false;
+    }
+
     switch (command) {
         case CHEAPINO_TELEMETRY_GET_INFO:
             memset(data, 0, CHEAPINO_TELEMETRY_REPORT_SIZE);
@@ -262,8 +269,8 @@ bool cheapino_telemetry_raw_hid_receive(uint8_t *data, uint8_t length) {
             telemetry_read_events(data);
             return true;
         case CHEAPINO_TELEMETRY_MARK: {
-            const uint8_t  phase     = data[1];
-            const uint16_t marker_id = cheapino_telemetry_read_u16_le(&data[2]);
+            const uint8_t  phase     = data[2];
+            const uint16_t marker_id = cheapino_telemetry_read_u16_le(&data[3]);
             telemetry_mark(marker_id, phase);
             telemetry_write_status(data, CHEAPINO_TELEMETRY_MARK);
             return true;

@@ -15,16 +15,16 @@ int main(void) {
     cheapino_telemetry_event_v1_t layout = {
         .timestamp_ms = 0x44332211u,
         .value = 0x6655u,
-        .type = 0x77u,
+        .type = CHEAPINO_TELEMETRY_EVENT_RESOLVED,
         .position = 0x88u,
-        .flags = 0x99u,
+        .flags = CHEAPINO_TELEMETRY_FLAG_PRESSED | CHEAPINO_TELEMETRY_FLAG_SYNTHETIC,
         .layer = 0xAAu,
         .mods = 0xBBu,
         .aux = 0xCCu,
     };
     const uint8_t *wire = (const uint8_t *)&layout;
     const uint8_t expected[CHEAPINO_TELEMETRY_EVENT_SIZE] = {
-        0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xAA, 0xBB, 0xCC
+        0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x02, 0x88, 0x09, 0xAA, 0xBB, 0xCC
     };
     for (size_t i = 0; i < sizeof(expected); ++i) {
         assert(wire[i] == expected[i]);

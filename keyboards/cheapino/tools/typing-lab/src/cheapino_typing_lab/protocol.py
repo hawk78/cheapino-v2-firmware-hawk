@@ -111,6 +111,7 @@ class ReadResponse:
 def empty_report(command: Command) -> bytearray:
     report = bytearray(REPORT_SIZE)
     report[0] = command
+    report[1] = PROTOCOL_VERSION
     return report
 
 
@@ -120,8 +121,8 @@ def marker_report(marker_id: int, phase: int) -> bytes:
     if not 0 <= phase <= 0xFF:
         raise ValueError("phase must fit in uint8")
     report = empty_report(Command.MARK)
-    report[1] = phase
-    struct.pack_into("<H", report, 2, marker_id)
+    report[2] = phase
+    struct.pack_into("<H", report, 3, marker_id)
     return bytes(report)
 
 
