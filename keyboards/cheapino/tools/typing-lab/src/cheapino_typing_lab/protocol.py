@@ -45,7 +45,7 @@ _EVENT = struct.Struct("<IHBBBBBB")
 assert _EVENT.size == EVENT_SIZE
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class Event:
     timestamp_ms: int
     value: int
@@ -79,7 +79,7 @@ class Event:
         }
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class Info:
     version: int
     event_size: int
@@ -88,7 +88,7 @@ class Info:
     report_size: int
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class Status:
     flags: StatusFlags
     queued: int
@@ -100,7 +100,7 @@ class Status:
         return bool(self.flags & StatusFlags.CAPTURING)
 
 
-@dataclass(frozen=True, slots=True)
+@dataclass(frozen=True)
 class ReadResponse:
     sequence: int
     flags: StatusFlags

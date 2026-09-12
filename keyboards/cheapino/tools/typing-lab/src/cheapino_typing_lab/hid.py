@@ -20,7 +20,7 @@ def _load_hid():
     return hid
 
 
-@dataclass(slots=True)
+@dataclass
 class HidTransport:
     device: object
 

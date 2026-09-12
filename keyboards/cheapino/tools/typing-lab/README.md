@@ -14,7 +14,7 @@ The firmware is still runtime-disabled after boot. `START` arms capture; `STOP` 
 
 ## Host
 
-Python 3.11+ is sufficient for protocol tests. Real keyboard access additionally needs `hidapi`:
+Python 3.9+ is sufficient for protocol tests and the CLI. Real keyboard access additionally needs `hidapi`:
 
 ```sh
 python -m pip install -e '.[hid]'

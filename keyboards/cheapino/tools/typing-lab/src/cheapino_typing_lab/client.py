@@ -28,7 +28,7 @@ class DroppedEventsError(TelemetryError):
     pass
 
 
-@dataclass(slots=True)
+@dataclass
 class TelemetryClient:
     transport: Transport
     _expected_read_sequence: int | None = None
