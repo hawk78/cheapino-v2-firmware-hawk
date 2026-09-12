@@ -1,0 +1,39 @@
+name: Cheapino typing lab
+
+on:
+  push:
+    paths:
+      - 'keyboards/cheapino/features/telemetry/**'
+      - 'keyboards/cheapino/tools/typing-lab/**'
+      - 'keyboards/cheapino/rules.mk'
+      - '.github/workflows/cheapino-typing-lab.yml'
+  pull_request:
+    paths:
+      - 'keyboards/cheapino/features/telemetry/**'
+      - 'keyboards/cheapino/tools/typing-lab/**'
+      - 'keyboards/cheapino/rules.mk'
+      - '.github/workflows/cheapino-typing-lab.yml'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  test-and-build:
+    runs-on: ubuntu-latest
+    container: ghcr.io/qmk/qmk_cli@sha256:2dc05fc9f32efebd6b05c2b8676ee548358bc7e151e9dbf4dac6b6eed4513b07
+
+    steps:
+      - name: Checkout Vial repo
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          submodules: recursive
+
+      - name: Trust checkout in container
+        run: git config --global --add safe.directory "$(pwd)"
+
+      - name: Native telemetry and host tests
+        run: keyboards/cheapino/tools/typing-lab/run-tests.sh
+
+      - name: Build instrumented Cheapino Vial firmware
+        run: make cheapino:vial CHEAPINO_TELEMETRY_ENABLE=yes
